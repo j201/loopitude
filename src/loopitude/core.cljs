@@ -1,5 +1,8 @@
-(ns loopitude.core)
+(ns loopitude.core
+  (:require [reagent.core :as reagent]
+            [loopitude.piano-roll :refer [piano-roll]]))
 
-(enable-console-print!)
+(def notes (reagent/atom {}))
 
-(println "Hello world!")
+(reagent/render-component [piano-roll {:notes notes, :row-offset 0, :playing-col nil}]
+                          (.-body js/document))

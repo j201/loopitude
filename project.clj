@@ -3,17 +3,16 @@
   :url "http://example.com/FIXME"
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2311"]]
+                 [org.clojure/clojurescript "0.0-2311"]
+                 [reagent "0.4.2"]]
 
   :plugins [[lein-cljsbuild "1.0.4-SNAPSHOT"]]
 
   :source-paths ["src"]
 
-  :cljsbuild {
-    :builds [{:id "loopitude"
-              :source-paths ["src"]
-              :compiler {
-                :output-to "loopitude.js"
-                :output-dir "out"
-                :optimizations :none
-                :source-map true}}]})
+  :cljsbuild {:builds [{:id "loopitude"
+                        :source-paths ["src"]
+                        :compiler {:output-to "loopitude.js"
+                                   :output-dir "out"
+                                   :optimizations :none
+                                   :source-map true}}]})
