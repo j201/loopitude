@@ -9,16 +9,17 @@
   (let [notes' @notes]
     [:table.piano-roll
      (for [row (range rows)
-           :let [note (+ row default-row-offset row-offset)]]
+           :let [note (+ (- rows row) default-row-offset row-offset)]]
        [:tr {:key row}
         (for [col (range cols)
               :let [on (contains? (notes' col) note)]]
           [:td {:class (str (when on "on ")
-                            (when (= col playing-col) "playing"))
+                            (when (= col playing-col) "playing ")
+                            (when (= -1 (+ row default-row-offset)) "middle"))
                 :key col
-                :on-click (fn []
-                            (reset! notes
-                                    (update-in notes' [col]
-                                               #((if on disj conj)
-                                                 (or % #{})
-                                                 note))))}])])]))
+                :on-mouse-down (fn []
+                                 (swap! notes
+                                        (fn [notes] (update-in notes [col]
+                                                               #((if on disj conj)
+                                                                 (or % #{})
+                                                                 note)))))}])])]))

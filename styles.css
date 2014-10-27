@@ -5,6 +5,10 @@
 	margin: 0;
 }
 
+.piano-roll td.middle {
+	background-color: #cff;
+}
+
 .piano-roll td.on {
 	background-color: blue;
 }
