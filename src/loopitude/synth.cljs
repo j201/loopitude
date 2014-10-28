@@ -48,6 +48,7 @@
   (reduce #(do (.connect %1 %2) %2)
           nodes))
 
+;; returns last node so can be disconnected
 (defn osc [note start duration]
   (let [osc (.createOscillator context)
         gain (adsr-gain 0.03 0.1 0.5 0.3 start duration)
@@ -58,16 +59,39 @@
     (set! (.-value (.-gain vol)) 0.1)
     (chain-nodes! osc gain lpf lpf2 vol)
     (.connect vol (.-destination context))
-    (play-note osc (freq note) start (+ duration 0.3))))
+    (play-note osc (freq note) start (+ duration 0.3))
+    {:osc osc, :gain gain, :lpf lpf, :lpf2 lpf2, :vol vol}))
 
 (defn quarter-time [tempo]
   (/ 60 tempo))
 
-(defn play [notes pitch-offset tempo]
-  (let [beat-time (quarter-time tempo)]
-    (doseq [[time pitches] notes
-            pitch pitches]
-      (osc (+ pitch pitch-offset)
-           (+ (.-currentTime context)
-              (* beat-time time))
-           beat-time))))
+(defn audio-time []
+  (.-currentTime context))
+
+;; nasty and with lots of mutation. screw w3c.
+(defn loop! [notes pitch-offset tempo length]
+  (let [beat-time (quarter-time tempo)
+        loop-time (* beat-time length)
+        start-time (.-currentTime context)
+        stopped (atom false)
+        oscs (atom [])
+        schedule-more (fn schedule-more [loops-scheduled]
+                        (when (not @stopped)
+                          (let [new-start-time (+ start-time (* loops-scheduled loop-time))]
+                            (do (reset! oscs
+                                        (concat @oscs
+                                                (doall (for [[time pitches] notes
+                                                             pitch pitches]
+                                                         (osc (+ pitch pitch-offset)
+                                                              (+ new-start-time
+                                                                 (* beat-time time))
+                                                              beat-time)))))
+                                (.setTimeout js/window
+                                             #(schedule-more (inc loops-scheduled))
+                                             (* 1000 (- new-start-time (.-currentTime context))))))))]
+    (do (schedule-more 0)
+        {:stop (fn []
+                 (do (reset! stopped true)
+                     (doseq [osc @oscs]
+                       (.disconnect (:vol osc)))))})))
+
