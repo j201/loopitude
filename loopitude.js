@@ -11,4 +11,5 @@ goog.addDependency("../reagent/impl/component.js", ['reagent.impl.component'], [
 goog.addDependency("../reagent/impl/template.js", ['reagent.impl.template'], ['reagent.impl.util', 'reagent.ratom', 'cljs.core', 'reagent.impl.batching', 'reagent.impl.component', 'reagent.debug', 'clojure.string']);
 goog.addDependency("../reagent/core.js", ['reagent.core'], ['reagent.impl.util', 'reagent.ratom', 'cljs.core', 'reagent.impl.template', 'reagent.impl.batching', 'reagent.impl.component']);
 goog.addDependency("../loopitude/piano_roll.js", ['loopitude.piano_roll'], ['reagent.core', 'cljs.core']);
-goog.addDependency("../loopitude/core.js", ['loopitude.core'], ['reagent.core', 'cljs.core', 'loopitude.synth', 'loopitude.piano_roll']);
+goog.addDependency("../loopitude/synth_page.js", ['loopitude.synth_page'], ['reagent.core', 'cljs.core', 'loopitude.synth', 'loopitude.piano_roll']);
+goog.addDependency("../loopitude/core.js", ['loopitude.core'], ['reagent.core', 'cljs.core', 'loopitude.synth', 'loopitude.synth_page', 'loopitude.piano_roll']);

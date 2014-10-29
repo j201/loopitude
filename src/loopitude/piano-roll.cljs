@@ -3,11 +3,12 @@
 
 (def rows 25)
 (def default-row-offset (- (.ceil js/Math (/ rows 2)))) ;; 0 is middle C, centered at 0
-(def cols 32)
+(def cols 8)
 
-(defn piano-roll [{:keys [notes row-offset playing-col]}]
+(defn piano-roll [{:keys [hidden notes row-offset playing-col]}]
   (let [notes' @notes]
     [:table.piano-roll
+     {:class (when hidden "hidden")}
      (for [row (range rows)
            :let [note (+ (- rows row) default-row-offset row-offset)]]
        [:tr {:key row}
