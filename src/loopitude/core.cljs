@@ -23,11 +23,12 @@
             (str "Synth " i)])
          (for [i (range synth-pages)]
            ^{:key i}
-           [synth-page {:hidden (not= i shown-piano-roll') 
+           [:div
+            [synth-page {:hidden (not= i shown-piano-roll') 
                         :notes (nth notes i)
                         :playing playing
                         :note-no note-no
-                        :tempo tempo}])
+                        :tempo tempo}]])
          [:button
           {:on-click #(reset! playing (not @playing))}
           (if @playing "Stop" "Play")]

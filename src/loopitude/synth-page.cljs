@@ -3,11 +3,10 @@
             [loopitude.synth :as synth]
             [loopitude.piano-roll :as piano-roll :refer [piano-roll]]))
 
-(defn synth-page [{:keys [key hidden notes playing note-no tempo]}]
-  (.log js/console hidden)
+(defn synth-page []
   (let [started (reagent/atom false)
         loop-obj (atom nil)]
-    (fn []
+    (fn [{:keys [key hidden notes playing note-no tempo]}]
       (do
         (when (and @playing (not @started))
           (reset! started true)
