@@ -7,7 +7,7 @@
 (def tempo (reagent/atom 200))
 
 (def synth-pages 4)
-(def notes (map #(%) (repeat synth-pages #(reagent/atom {}))))
+(def notes (map #(%) (repeat synth-pages #(reagent/atom {0 #{0}}))))
 (def shown-piano-roll (reagent/atom 0))
 
 (defn player []
