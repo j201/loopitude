@@ -2,6 +2,7 @@ html {
 	height: 100%;
 	width: 100%;
 	background-color: #999;
+	color: white;
 	background: radial-gradient(ellipse at top, #66666f 0%, #222226 100%);
 }
 

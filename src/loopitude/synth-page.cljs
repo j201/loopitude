@@ -5,6 +5,7 @@
 
 (defn synth-page []
   (let [started (reagent/atom false)
+        row-offset (atom 0)
         loop-obj (atom nil)]
     (fn [{:keys [key hidden notes playing note-no tempo]}]
       (do
@@ -14,7 +15,17 @@
         (when (and (not @playing) @started)
           (reset! started false)
           ((:stop @loop-obj)))
-        [piano-roll {:hidden hidden
-                     :notes notes
-                     :row-offset 0
-                     :playing-col (if @playing @note-no nil)}]))))
+        (when (not hidden)
+          [:div
+           [piano-roll {:hidden hidden
+                        :notes notes
+                        :row-offset row-offset 
+                        :playing-col (if @playing @note-no nil)}]
+           [:div
+            "Note shift (octaves)"
+            [:select {:on-change #(reset! row-offset (-> % .-target .-value int))}
+             [:option {:value 24} "+2"]
+             [:option {:value 12} "+1"]
+             [:option {:value 0, :selected "selected"} "0"]
+             [:option {:value -12} "-1"]
+             [:option {:value -24} "-2"]]]])))))
