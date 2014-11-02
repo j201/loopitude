@@ -26,6 +26,10 @@ table {
 	background-color: #888;
 }
 
+.piano-roll td.middle {
+	background-color: #888;
+}
+
 .piano-roll td.on {
 	background-color: #0f0;
 	background: linear-gradient(to bottom, #3f3 0%, #0d0 100%);
