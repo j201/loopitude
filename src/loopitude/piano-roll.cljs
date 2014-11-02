@@ -3,11 +3,13 @@
 
 (def rows 25)
 (def default-row-offset (- (.ceil js/Math (/ rows 2)))) ;; 0 is middle C, centered at 0
-(def cols 32)
+(def cols 16)
+(def black-keys #{1 3 6 8 10})
 
 (defn- cell [{:keys [on playing on-mouse toggle-note col row-note]}]
   [:td {:class (str (when on "on ")
                     (when playing "playing ")
+                    (when (black-keys (mod row-note 12)) "black-key ")
                     (when (= 0 row-note) "middle"))
         :on-mouse-down #(do (.log js/console "click") (toggle-note col row-note))}])
 

@@ -22,8 +22,8 @@ table {
 	margin: 0;
 }
 
-.piano-roll td.middle {
-	background-color: #888;
+.piano-roll td.black-key {
+	background-color: #444;
 }
 
 .piano-roll td.middle {
