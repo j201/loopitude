@@ -7,7 +7,7 @@
 (def tempo (reagent/atom 200))
 
 (def synth-pages 4)
-(def notes (map #(%) (repeat synth-pages #(reagent/atom {0 #{0}}))))
+(def notes (map #(%) (repeat synth-pages #(reagent/atom {}))))
 (def shown-piano-roll (reagent/atom 0))
 
 (defn player []
@@ -33,7 +33,15 @@
           {:on-click #(reset! playing (not @playing))}
           (if @playing "Stop" "Play")]
          [:input {:type "range" :min "100" :max "500" :step "10"
-                  :on-change #(reset! tempo (.-value (.-target %)))}]]))))
+                  :on-change #(reset! tempo (.-value (.-target %)))}]
+         [:div
+          [:button
+           {:on-click #(reset! (nth notes @shown-piano-roll) {})}
+           "Clear"]
+          [:button
+           {:on-click #(doseq [notes-map notes]
+                         (reset! notes-map {}))}
+           "Clear All"]]]))))
 
 (reagent/render-component [player]
                           (.-body js/document))

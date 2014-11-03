@@ -11,7 +11,7 @@
                     (when playing "playing ")
                     (when (black-keys (mod row-note 12)) "black-key ")
                     (when (= 0 row-note) "middle"))
-        :on-mouse-down #(do (.log js/console "click") (toggle-note col row-note))}])
+        :on-mouse-down #(toggle-note col row-note)}])
 
 (defn- piano-row [{:keys [row-note notes toggle-note playing-col]}]
   [:tr (for [col (range cols)
@@ -32,11 +32,10 @@
                                             (or % #{})
                                             row-note)))))]
     (fn [{:keys [notes row-offset playing-col]}]
-      (let [notes' @notes
-            row-offset' @row-offset]
+      (let [notes' @notes]
         [:table.piano-roll
          (for [row (range rows)
-               :let [row-note (+ (- rows row) default-row-offset row-offset')]]
+               :let [row-note (+ (- rows row) default-row-offset row-offset)]]
            ^{:key row}
            [piano-row {:row-note row-note
                        :notes (set (filter #(contains? (notes' %) row-note) (range cols)))
