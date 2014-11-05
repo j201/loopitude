@@ -48,15 +48,21 @@
   (reduce #(do (.connect %1 %2) %2)
           nodes))
 
+(def default-settings {:a 0.03, :d 0.1, :s 0.5, :r 0.3
+                       :lpf1-f 500,
+                       :lpf2-f 2000,
+                       :vol 0.1})
+
 ;; returns last node so can be disconnected
-(defn osc [note start duration]
-  (let [osc (.createOscillator context)
-        gain (adsr-gain 0.03 0.1 0.5 0.3 start duration)
-        lpf (biquad "lowpass" 500 1 0)
-        lpf2 (biquad "lowpass" 2000 10 10)
+(defn osc [note start duration in-settings]
+  (let [settings (merge default-settings in-settings)
+        osc (.createOscillator context)
+        gain (adsr-gain (settings :a) (settings :d) (settings :s) (settings :r) start duration)
+        lpf (biquad "lowpass" (settings :lpf1-f) 1 0)
+        lpf2 (biquad "lowpass" (settings :lpf2-f) 10 10)
         vol (.createGain context)]
     (set! (.-type osc) "triangle")
-    (set! (.-value (.-gain vol)) 0.1)
+    (set! (.-value (.-gain vol)) (settings :vol))
     (chain-nodes! osc gain lpf lpf2 vol)
     (.connect vol (.-destination context))
     (play-note osc (freq note) start (+ duration 0.3))
@@ -69,7 +75,7 @@
   (.-currentTime context))
 
 ;; nasty and with lots of mutation. screw w3c.
-(defn loop! [notes pitch-offset tempo length]
+(defn loop! [notes pitch-offset tempo length settings]
   (let [beat-time (quarter-time tempo)
         loop-time (* beat-time length)
         start-time (.-currentTime context)
@@ -85,7 +91,8 @@
                                                          (osc (+ pitch pitch-offset)
                                                               (+ new-start-time
                                                                  (* beat-time time))
-                                                              beat-time)))))
+                                                              beat-time
+                                                              settings)))))
                                 (.setTimeout js/window
                                              #(schedule-more (inc loops-scheduled))
                                              (* 1000 (- new-start-time (.-currentTime context))))))))]
