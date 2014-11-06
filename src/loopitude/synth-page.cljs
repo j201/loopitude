@@ -1,15 +1,10 @@
 (ns loopitude.synth-page
   (:require [reagent.core :as reagent :refer [atom]]
             [loopitude.synth :as synth]
+            [loopitude.settings :as settings]
             [loopitude.piano-roll :as piano-roll :refer [piano-roll]]))
 
 (def default-settings {:vol 0.125})
-
-(defn e-val [e]
-  (.-value (.-target e)))
-
-(defn log-vol [x]
-  (* x x x))
 
 (defn synth-page []
   (let [started (reagent/atom false)
@@ -38,9 +33,6 @@
            [:option {:value "0"} "0"]
            [:option {:value "-12"} "-1"]
            [:option {:value "-24"} "-2"]]]
-         [:div
-          "Volume"
-          [:input {:type "range", :min "0", :max "1", :step "0.01"
-                   :on-change #(reset! settings
-                                       (assoc @settings
-                                              :vol (log-vol (js/parseFloat (e-val %)))))}]]]))))
+         [settings/volume settings]
+         [settings/adsr settings]
+         ]))))

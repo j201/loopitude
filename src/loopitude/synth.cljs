@@ -65,7 +65,7 @@
     (set! (.-value (.-gain vol)) (settings :vol))
     (chain-nodes! osc gain lpf lpf2 vol)
     (.connect vol (.-destination context))
-    (play-note osc (freq note) start (+ duration 0.3))
+    (play-note osc (freq note) start (+ duration (settings :r)))
     {:osc osc, :gain gain, :lpf lpf, :lpf2 lpf2, :vol vol}))
 
 (defn quarter-time [tempo]
@@ -78,7 +78,7 @@
 (defn loop! [notes pitch-offset tempo length settings]
   (let [beat-time (quarter-time tempo)
         loop-time (* beat-time length)
-        start-time (.-currentTime context)
+        start-time (+ (.-currentTime context) 0.05)
         stopped (atom false)
         oscs (atom [])
         schedule-more (fn schedule-more [loops-scheduled]

@@ -1,12 +1,16 @@
 html {
 	height: 100%;
 	width: 100%;
-	background-color: #999;
-	color: white;
-	background: radial-gradient(ellipse at top, #66666f 0%, #222226 100%);
+	background-color: #222226;
 }
 
 body {
+	height: 100%;
+	width: 100%;
+	color: white;
+	background-color: #999;
+	background: radial-gradient(ellipse at top, #66666f 0%, #222226 100%);
+	background-repeat: no-repeat;
 	text-align: center;
 }
 
