@@ -49,8 +49,8 @@
           nodes))
 
 (def default-settings {:a 0.03, :d 0.1, :s 0.5, :r 0.3
-                       :lpf1-f 500,
-                       :lpf2-f 2000,
+                       :filt1 {:f 632, :q 1, :gain 0}
+                       :filt2 {:f 632, :q 1, :gain 0} ,
                        :vol 0.1})
 
 ;; returns last node so can be disconnected
@@ -58,8 +58,8 @@
   (let [settings (merge default-settings in-settings)
         osc (.createOscillator context)
         gain (adsr-gain (settings :a) (settings :d) (settings :s) (settings :r) start duration)
-        lpf (biquad "lowpass" (settings :lpf1-f) 1 0)
-        lpf2 (biquad "lowpass" (settings :lpf2-f) 10 10)
+        lpf (biquad "lowpass" (-> settings :filt1 :f) (-> settings :filt1 :q) (-> settings :filt1 :gain))
+        lpf2 (biquad "lowpass" (-> settings :filt2 :f) (-> settings :filt2 :q) (-> settings :filt2 :gain)) 
         vol (.createGain context)]
     (set! (.-type osc) "triangle")
     (set! (.-value (.-gain vol)) (settings :vol))

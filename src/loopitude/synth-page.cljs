@@ -57,4 +57,6 @@
            [:option {:value "-24"} "-2"]]]
          [settings/volume settings]
          [settings/adsr settings]
+         [settings/filt settings :filt1]
+         [settings/filt settings :filt2]
          ]))))
