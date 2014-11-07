@@ -79,26 +79,32 @@
   (let [beat-time (quarter-time tempo)
         loop-time (* beat-time length)
         start-time (+ (.-currentTime context) 0.05)
-        stopped (atom false)
+        timeoutID (atom nil)
         oscs (atom [])
-        schedule-more (fn schedule-more [loops-scheduled]
-                        (when (not @stopped)
-                          (let [new-start-time (+ start-time (* loops-scheduled loop-time))]
-                            (do (reset! oscs
-                                        (concat @oscs
-                                                (doall (for [[time pitches] notes
-                                                             pitch pitches]
-                                                         (osc (+ pitch pitch-offset)
-                                                              (+ new-start-time
-                                                                 (* beat-time time))
-                                                              beat-time
-                                                              settings)))))
-                                (.setTimeout js/window
-                                             #(schedule-more (inc loops-scheduled))
-                                             (* 1000 (- new-start-time (.-currentTime context))))))))]
-    (do (schedule-more 0)
-        {:stop (fn []
-                 (do (reset! stopped true)
-                     (doseq [osc @oscs]
-                       (.disconnect (:vol osc)))))})))
+        schedule-more! (fn schedule-more! [loops-scheduled start-time settings notes]
+                         (let [new-start-time (+ start-time (* loops-scheduled loop-time))]
+                           (do (reset! oscs
+                                       (concat @oscs
+                                               (doall (for [[time pitches] notes
+                                                            pitch pitches]
+                                                        (osc (+ pitch pitch-offset)
+                                                             (+ new-start-time
+                                                                (* beat-time time))
+                                                             beat-time
+                                                             settings)))))
+                               (reset! timeoutID (.setTimeout js/window
+                                                              #(schedule-more! (inc loops-scheduled) start-time settings notes)
+                                                              (* 1000 (- new-start-time (.-currentTime context))))))))
+        stop! (fn []
+                (doseq [osc @oscs]
+                  (.disconnect (:vol osc)))
+                (.clearTimeout js/window @timeoutID))
+        update! (fn [settings]
+                  (stop!)
+                  (let [current-time (.-currentTime context)
+                        offset (mod (- current-time start-time) loop-time)]
+                    (schedule-more! 0 (- current-time offset) settings notes)))]
+    (schedule-more! 0 start-time settings notes)
+    {:stop! stop!
+     :update! update!}))
 

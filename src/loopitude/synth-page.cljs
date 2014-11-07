@@ -6,18 +6,40 @@
 
 (def default-settings {:vol 0.125})
 
+;; TODO: move to utils?
+(defn throttle [ms f]
+  (let [waiting (atom false)
+        called-while-waiting (atom false)
+        args (atom [])]
+    (fn [& args']
+      (reset! args args')
+      (if @waiting
+        (reset! called-while-waiting true)
+        (do (apply f @args)
+            (reset! waiting true)
+            (reset! called-while-waiting false)
+            (js/setTimeout (fn []
+                             (when @called-while-waiting
+                               (apply f @args))
+                             (reset! waiting false))
+                           ms))))))
+
 (defn synth-page []
   (let [started (reagent/atom false)
         settings (reagent/atom default-settings)
         row-offset (atom "0")
         loop-obj (atom nil)]
+    (add-watch settings :watch-change (throttle 200 (fn [key ref old new]
+                                                      (when @loop-obj
+                                                        ((:update! @loop-obj) new)))))
     (fn [{:keys [key hidden notes playing note-no tempo]}]
       (when (and @playing (not @started))
         (reset! started true)
         (reset! loop-obj (synth/loop! @notes 0 @tempo piano-roll/cols @settings)))
       (when (and (not @playing) @started)
         (reset! started false)
-        ((:stop @loop-obj)))
+        ((:stop! @loop-obj))
+        (reset! loop-obj nil))
       (when (not hidden)
         [:div
          [piano-roll {:hidden hidden
