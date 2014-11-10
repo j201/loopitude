@@ -18,8 +18,9 @@
         [:div
          (for [i (range synth-pages)]
            ^{:key i}
-           [:button
-            {:on-click #(reset! shown-piano-roll i)}
+           [:button.synth-tab
+            {:on-click #(reset! shown-piano-roll i)
+             :class (when (= i shown-piano-roll') "shown")}
             (str "Synth " i)])
          (for [i (range synth-pages)]
            ^{:key i}

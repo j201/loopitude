@@ -12,6 +12,7 @@ body {
 	background: radial-gradient(ellipse at top, #66666f 0%, #222226 100%);
 	background-repeat: no-repeat;
 	text-align: center;
+	font-family: "Exo 2", sans-serif;
 }
 
 table {
@@ -40,3 +41,19 @@ table {
 }
 
 .hidden { display: none; }
+
+.synth-tab {
+	font-family: "Exo 2", sans-serif;
+	background-color: #ccc;
+	border: none;
+	box-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+	border-radius: 0 0 6px 6px;
+	margin: 0 2px;
+	padding: 0 10px;
+	cursor: pointer;
+}
+
+.synth-tab.shown {
+	background-color: #3e3;
+	background: linear-gradient(to bottom, #3f3 0%, #2e2 100%);
+}
