@@ -23,14 +23,15 @@
                 :row-note row-note
                 :toggle-note toggle-note}])])
 
-(defn piano-roll [{:keys [notes]}]
+(defn piano-roll [{:keys [notes on-note-change]}]
   (let [toggle-note (fn [col row-note]
                       (swap! notes
                              (fn [notes]
                                (update-in notes [col]
                                           #((if (contains? (notes col) row-note) disj conj)
                                             (or % #{})
-                                            row-note)))))]
+                                            row-note))))
+                      (on-note-change @notes))]
     (fn [{:keys [notes row-offset playing-col]}]
       (let [notes' @notes]
         [:table.piano-roll

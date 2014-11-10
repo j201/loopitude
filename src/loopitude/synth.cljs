@@ -74,6 +74,9 @@
 (defn audio-time []
   (.-currentTime context))
 
+(defn count-notes [notes]
+  (reduce + (map count notes)))
+
 ;; nasty and with lots of mutation. screw w3c.
 (defn loop! [notes pitch-offset tempo length settings]
   (let [beat-time (quarter-time tempo)
@@ -81,30 +84,35 @@
         start-time (+ (.-currentTime context) 0.05)
         timeoutID (atom nil)
         oscs (atom [])
-        schedule-more! (fn schedule-more! [loops-scheduled start-time settings notes]
+        notes (atom notes)
+        settings (atom settings)
+        schedule-more! (fn schedule-more! [loops-scheduled start-time]
                          (let [new-start-time (+ start-time (* loops-scheduled loop-time))]
                            (do (reset! oscs
-                                       (concat @oscs
-                                               (doall (for [[time pitches] notes
-                                                            pitch pitches]
-                                                        (osc (+ pitch pitch-offset)
-                                                             (+ new-start-time
-                                                                (* beat-time time))
-                                                             beat-time
-                                                             settings)))))
+                                       (take (* 2 (count-notes @notes)) ;; drop old notes to avoid memory leaks and speed up updates
+                                             (concat (doall (for [[time pitches] @notes
+                                                                  pitch pitches]
+                                                              (osc (+ pitch pitch-offset)
+                                                                   (+ new-start-time
+                                                                      (* beat-time time))
+                                                                   beat-time
+                                                                   @settings)))
+                                                     @oscs)))
                                (reset! timeoutID (.setTimeout js/window
-                                                              #(schedule-more! (inc loops-scheduled) start-time settings notes)
+                                                              #(schedule-more! (inc loops-scheduled) start-time)
                                                               (* 1000 (- new-start-time (.-currentTime context))))))))
         stop! (fn []
                 (doseq [osc @oscs]
                   (.disconnect (:vol osc)))
                 (.clearTimeout js/window @timeoutID))
-        update! (fn [settings]
+        update! (fn [{new-settings :settings, new-notes :notes}]
                   (stop!)
+                  (when new-settings (reset! settings new-settings))
+                  (when new-notes (reset! notes new-notes))
                   (let [current-time (.-currentTime context)
                         offset (mod (- current-time start-time) loop-time)]
-                    (schedule-more! 0 (- current-time offset) settings notes)))]
-    (schedule-more! 0 start-time settings notes)
+                    (schedule-more! 0 (- current-time offset))))]
+    (schedule-more! 0 start-time)
     {:stop! stop!
      :update! update!}))
 

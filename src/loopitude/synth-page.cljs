@@ -28,10 +28,13 @@
   (let [started (reagent/atom false)
         settings (reagent/atom default-settings)
         row-offset (atom "0")
-        loop-obj (atom nil)]
+        loop-obj (atom nil)
+        on-note-change (fn [notes]
+                         (when @loop-obj
+                           ((:update! @loop-obj) {:notes notes})))]
     (add-watch settings :watch-change (throttle 200 (fn [key ref old new]
                                                       (when @loop-obj
-                                                        ((:update! @loop-obj) new)))))
+                                                        ((:update! @loop-obj) {:settings new})))))
     (fn [{:keys [key hidden notes playing note-no tempo]}]
       (when (and @playing (not @started))
         (reset! started true)
@@ -44,6 +47,7 @@
         [:div
          [piano-roll {:hidden hidden
                       :notes notes
+                      :on-note-change on-note-change
                       :row-offset (int @row-offset) 
                       :playing-col (if @playing @note-no nil)}]
          [:div
