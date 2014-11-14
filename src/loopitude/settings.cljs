@@ -21,6 +21,7 @@
 
 (defn- range1 "A range input from 0 to 1" [default on-change]
   [:input {:type "range", :min "0", :max "1", :step "0.01", :default-value (str default)
+           :class "settings-range"
            :on-change #(on-change (js/parseFloat (e-val %)))}])
 
 (defn volume [settings]

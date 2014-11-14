@@ -57,3 +57,9 @@ table {
 	background-color: #3e3;
 	background: linear-gradient(to bottom, #3f3 0%, #2e2 100%);
 }
+
+.settings-range {
+	height: 20px;
+	width: 160px;
+	transform: rotate(-90deg);
+}
